@@ -162,6 +162,8 @@ $klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response
             'password' => $password
         ) = $request->paramsPost();
 
+        $user = $user ?? new User;
+
         $user->setUsername($username);
         $user->setPassword($password);
 
