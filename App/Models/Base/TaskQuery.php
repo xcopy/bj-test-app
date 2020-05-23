@@ -23,11 +23,13 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTaskQuery orderByUsername($order = Criteria::ASC) Order by the username column
  * @method     ChildTaskQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildTaskQuery orderByContent($order = Criteria::ASC) Order by the content column
+ * @method     ChildTaskQuery orderByStatus($order = Criteria::ASC) Order by the status column
  *
  * @method     ChildTaskQuery groupById() Group by the id column
  * @method     ChildTaskQuery groupByUsername() Group by the username column
  * @method     ChildTaskQuery groupByEmail() Group by the email column
  * @method     ChildTaskQuery groupByContent() Group by the content column
+ * @method     ChildTaskQuery groupByStatus() Group by the status column
  *
  * @method     ChildTaskQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildTaskQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -43,7 +45,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTask findOneById(int $id) Return the first ChildTask filtered by the id column
  * @method     ChildTask findOneByUsername(string $username) Return the first ChildTask filtered by the username column
  * @method     ChildTask findOneByEmail(string $email) Return the first ChildTask filtered by the email column
- * @method     ChildTask findOneByContent(string $content) Return the first ChildTask filtered by the content column *
+ * @method     ChildTask findOneByContent(string $content) Return the first ChildTask filtered by the content column
+ * @method     ChildTask findOneByStatus(boolean $status) Return the first ChildTask filtered by the status column *
 
  * @method     ChildTask requirePk($key, ConnectionInterface $con = null) Return the ChildTask by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTask requireOne(ConnectionInterface $con = null) Return the first ChildTask matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -52,12 +55,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildTask requireOneByUsername(string $username) Return the first ChildTask filtered by the username column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTask requireOneByEmail(string $email) Return the first ChildTask filtered by the email column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildTask requireOneByContent(string $content) Return the first ChildTask filtered by the content column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildTask requireOneByStatus(boolean $status) Return the first ChildTask filtered by the status column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildTask[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildTask objects based on current ModelCriteria
  * @method     ChildTask[]|ObjectCollection findById(int $id) Return ChildTask objects filtered by the id column
  * @method     ChildTask[]|ObjectCollection findByUsername(string $username) Return ChildTask objects filtered by the username column
  * @method     ChildTask[]|ObjectCollection findByEmail(string $email) Return ChildTask objects filtered by the email column
  * @method     ChildTask[]|ObjectCollection findByContent(string $content) Return ChildTask objects filtered by the content column
+ * @method     ChildTask[]|ObjectCollection findByStatus(boolean $status) Return ChildTask objects filtered by the status column
  * @method     ChildTask[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
  */
@@ -156,7 +161,7 @@ abstract class TaskQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, username, email, content FROM tasks WHERE id = :p0';
+        $sql = 'SELECT id, username, email, content, status FROM tasks WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -360,6 +365,33 @@ abstract class TaskQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaskTableMap::COL_CONTENT, $content, $comparison);
+    }
+
+    /**
+     * Filter the query on the status column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStatus(true); // WHERE status = true
+     * $query->filterByStatus('yes'); // WHERE status = true
+     * </code>
+     *
+     * @param     boolean|string $status The value to use as filter.
+     *              Non-boolean arguments are converted using the following rules:
+     *                * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *                * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     *              Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildTaskQuery The current query, for fluid interface
+     */
+    public function filterByStatus($status = null, $comparison = null)
+    {
+        if (is_string($status)) {
+            $status = in_array(strtolower($status), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+        }
+
+        return $this->addUsingAlias(TaskTableMap::COL_STATUS, $status, $comparison);
     }
 
     /**

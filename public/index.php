@@ -21,7 +21,7 @@ $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $resp
     ) = $request->paramsGet();
 
     $allowedOrders = [Criteria::DESC, Criteria::ASC];
-    $sortableColumns = ['id', 'username', 'email'];
+    $sortableColumns = ['id', 'status', 'username', 'email'];
 
     $_column = in_array($column, $sortableColumns)
         ? $column

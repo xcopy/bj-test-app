@@ -58,7 +58,7 @@ class TaskTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class TaskTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the id field
@@ -91,6 +91,11 @@ class TaskTableMap extends TableMap
     const COL_CONTENT = 'tasks.content';
 
     /**
+     * the column name for the status field
+     */
+    const COL_STATUS = 'tasks.status';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -102,11 +107,11 @@ class TaskTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Username', 'Email', 'Content', ),
-        self::TYPE_CAMELNAME     => array('id', 'username', 'email', 'content', ),
-        self::TYPE_COLNAME       => array(TaskTableMap::COL_ID, TaskTableMap::COL_USERNAME, TaskTableMap::COL_EMAIL, TaskTableMap::COL_CONTENT, ),
-        self::TYPE_FIELDNAME     => array('id', 'username', 'email', 'content', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Username', 'Email', 'Content', 'Status', ),
+        self::TYPE_CAMELNAME     => array('id', 'username', 'email', 'content', 'status', ),
+        self::TYPE_COLNAME       => array(TaskTableMap::COL_ID, TaskTableMap::COL_USERNAME, TaskTableMap::COL_EMAIL, TaskTableMap::COL_CONTENT, TaskTableMap::COL_STATUS, ),
+        self::TYPE_FIELDNAME     => array('id', 'username', 'email', 'content', 'status', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -116,11 +121,11 @@ class TaskTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Username' => 1, 'Email' => 2, 'Content' => 3, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'username' => 1, 'email' => 2, 'content' => 3, ),
-        self::TYPE_COLNAME       => array(TaskTableMap::COL_ID => 0, TaskTableMap::COL_USERNAME => 1, TaskTableMap::COL_EMAIL => 2, TaskTableMap::COL_CONTENT => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'username' => 1, 'email' => 2, 'content' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Username' => 1, 'Email' => 2, 'Content' => 3, 'Status' => 4, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'username' => 1, 'email' => 2, 'content' => 3, 'status' => 4, ),
+        self::TYPE_COLNAME       => array(TaskTableMap::COL_ID => 0, TaskTableMap::COL_USERNAME => 1, TaskTableMap::COL_EMAIL => 2, TaskTableMap::COL_CONTENT => 3, TaskTableMap::COL_STATUS => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'username' => 1, 'email' => 2, 'content' => 3, 'status' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -144,6 +149,7 @@ class TaskTableMap extends TableMap
         $this->addColumn('username', 'Username', 'VARCHAR', true, 255, null);
         $this->addColumn('email', 'Email', 'VARCHAR', true, 255, null);
         $this->addColumn('content', 'Content', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('status', 'Status', 'BOOLEAN', false, 1, false);
     } // initialize()
 
     /**
@@ -311,11 +317,13 @@ class TaskTableMap extends TableMap
             $criteria->addSelectColumn(TaskTableMap::COL_USERNAME);
             $criteria->addSelectColumn(TaskTableMap::COL_EMAIL);
             $criteria->addSelectColumn(TaskTableMap::COL_CONTENT);
+            $criteria->addSelectColumn(TaskTableMap::COL_STATUS);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.username');
             $criteria->addSelectColumn($alias . '.email');
             $criteria->addSelectColumn($alias . '.content');
+            $criteria->addSelectColumn($alias . '.status');
         }
     }
 
