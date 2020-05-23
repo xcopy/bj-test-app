@@ -12,7 +12,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for task in tasks %}
+            {% for task in pager %}
                 <tr>
                     <td class="text-center">{{ task.id }}</td>
                     <td>{{ task.username }}</td>
@@ -22,5 +22,29 @@
             {% endfor %}
             </tbody>
         </table>
+
+        {% if pager.haveToPaginate %}
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% if not pager.isFirstPage %}
+                        <li class="page-item" title="Prev">
+                            <a href="/?page={{ pager.previousPage }}" class="page-link">&laquo;</a>
+                        </li>
+                    {% endif %}
+
+                    {% for page in pager.links %}
+                        <li class="page-item{{ (pager.page == page) ? ' active'}}">
+                            <a href="/?page={{ page }}" class="page-link">{{ page }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if not pager.isLastPage %}
+                        <li class="page-item" title="Next">
+                            <a href="/?page={{ pager.nextPage }}" class="page-link">&raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 {% endblock %}
