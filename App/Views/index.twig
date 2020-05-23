@@ -25,7 +25,12 @@
                     </td>
                     <td>{{ task.username }}</td>
                     <td>{{ task.email }}</td>
-                    <td>{{ task.content|e }}</td>
+                    <td>
+                        <div>{{ task.content|e }}</div>
+                        {% if task.edited %}
+                            <small class="badge badge-info">edited by admin</small>
+                        {% endif %}
+                    </td>
                     {% if user.primaryKey %}
                         <td>
                             <a href="/edit/{{ task.id }}?{{ request.server.get('QUERY_STRING') }}">Edit</a>

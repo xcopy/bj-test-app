@@ -108,6 +108,14 @@ abstract class Task implements ActiveRecordInterface
     protected $status;
 
     /**
+     * The value for the edited field.
+     *
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $edited;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -141,6 +149,7 @@ abstract class Task implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->status = false;
+        $this->edited = false;
     }
 
     /**
@@ -431,6 +440,26 @@ abstract class Task implements ActiveRecordInterface
     }
 
     /**
+     * Get the [edited] column value.
+     *
+     * @return boolean
+     */
+    public function getEdited()
+    {
+        return $this->edited;
+    }
+
+    /**
+     * Get the [edited] column value.
+     *
+     * @return boolean
+     */
+    public function isEdited()
+    {
+        return $this->getEdited();
+    }
+
+    /**
      * Set the value of [id] column.
      *
      * @param int $v new value
@@ -539,6 +568,34 @@ abstract class Task implements ActiveRecordInterface
     } // setStatus()
 
     /**
+     * Sets the value of the [edited] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param  boolean|integer|string $v The new value
+     * @return $this|\App\Models\Task The current object (for fluent API support)
+     */
+    public function setEdited($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->edited !== $v) {
+            $this->edited = $v;
+            $this->modifiedColumns[TaskTableMap::COL_EDITED] = true;
+        }
+
+        return $this;
+    } // setEdited()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -549,6 +606,10 @@ abstract class Task implements ActiveRecordInterface
     public function hasOnlyDefaultValues()
     {
             if ($this->status !== false) {
+                return false;
+            }
+
+            if ($this->edited !== false) {
                 return false;
             }
 
@@ -592,6 +653,9 @@ abstract class Task implements ActiveRecordInterface
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : TaskTableMap::translateFieldName('Status', TableMap::TYPE_PHPNAME, $indexType)];
             $this->status = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : TaskTableMap::translateFieldName('Edited', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->edited = (null !== $col) ? (boolean) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -600,7 +664,7 @@ abstract class Task implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = TaskTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = TaskTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\App\\Models\\Task'), 0, $e);
@@ -816,6 +880,9 @@ abstract class Task implements ActiveRecordInterface
         if ($this->isColumnModified(TaskTableMap::COL_STATUS)) {
             $modifiedColumns[':p' . $index++]  = 'status';
         }
+        if ($this->isColumnModified(TaskTableMap::COL_EDITED)) {
+            $modifiedColumns[':p' . $index++]  = 'edited';
+        }
 
         $sql = sprintf(
             'INSERT INTO tasks (%s) VALUES (%s)',
@@ -841,6 +908,9 @@ abstract class Task implements ActiveRecordInterface
                         break;
                     case 'status':
                         $stmt->bindValue($identifier, (int) $this->status, PDO::PARAM_INT);
+                        break;
+                    case 'edited':
+                        $stmt->bindValue($identifier, (int) $this->edited, PDO::PARAM_INT);
                         break;
                 }
             }
@@ -919,6 +989,9 @@ abstract class Task implements ActiveRecordInterface
             case 4:
                 return $this->getStatus();
                 break;
+            case 5:
+                return $this->getEdited();
+                break;
             default:
                 return null;
                 break;
@@ -953,6 +1026,7 @@ abstract class Task implements ActiveRecordInterface
             $keys[2] => $this->getEmail(),
             $keys[3] => $this->getContent(),
             $keys[4] => $this->getStatus(),
+            $keys[5] => $this->getEdited(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1007,6 +1081,9 @@ abstract class Task implements ActiveRecordInterface
             case 4:
                 $this->setStatus($value);
                 break;
+            case 5:
+                $this->setEdited($value);
+                break;
         } // switch()
 
         return $this;
@@ -1047,6 +1124,9 @@ abstract class Task implements ActiveRecordInterface
         }
         if (array_key_exists($keys[4], $arr)) {
             $this->setStatus($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setEdited($arr[$keys[5]]);
         }
     }
 
@@ -1103,6 +1183,9 @@ abstract class Task implements ActiveRecordInterface
         }
         if ($this->isColumnModified(TaskTableMap::COL_STATUS)) {
             $criteria->add(TaskTableMap::COL_STATUS, $this->status);
+        }
+        if ($this->isColumnModified(TaskTableMap::COL_EDITED)) {
+            $criteria->add(TaskTableMap::COL_EDITED, $this->edited);
         }
 
         return $criteria;
@@ -1194,6 +1277,7 @@ abstract class Task implements ActiveRecordInterface
         $copyObj->setEmail($this->getEmail());
         $copyObj->setContent($this->getContent());
         $copyObj->setStatus($this->getStatus());
+        $copyObj->setEdited($this->getEdited());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1234,6 +1318,7 @@ abstract class Task implements ActiveRecordInterface
         $this->email = null;
         $this->content = null;
         $this->status = null;
+        $this->edited = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();

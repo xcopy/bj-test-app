@@ -133,6 +133,7 @@ $klein->respond(['GET', 'POST'], '/edit/[i:id]', function (Request $request, Res
         $task->setEmail($email);
         $task->setContent($content);
         $task->setStatus($status === 'on');
+        $task->setEdited($content === $task->getContent());
 
         if (!$task->validate()) {
             foreach ($task->getValidationFailures() as $failure) {
