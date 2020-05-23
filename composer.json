@@ -5,7 +5,8 @@
     "klein/klein": "^2.1",
     "twig/twig": "^3.0",
     "propel/propel": "~2.0@dev",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "fzaninotto/faker": "^1.9"
   },
   "autoload": {
     "psr-4": {
