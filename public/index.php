@@ -168,11 +168,13 @@ $klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response
         $user->setPassword($password);
 
         if ($user->validate()) {
-            $user = UserQuery::create()->findOneByUsername($username);
+            $tempUser = UserQuery::create()->findOneByUsername($username);
 
-            if (password_verify($password, $user->getPassword())) {
-                $_SESSION['user_id'] = $user->getPrimaryKey();
+            if (password_verify($password, $tempUser->getPassword())) {
+                $_SESSION['user_id'] = $tempUser->getPrimaryKey();
                 $response->redirect('/');
+            } else {
+                $errors['password'] = 'Wrong password.';
             }
         } else {
             foreach ($user->getValidationFailures() as $failure) {
