@@ -10,6 +10,12 @@
     <nav class="navbar navbar-dark bg-dark">
         <div class="container">
             <a href="/" class="navbar-brand mb-0 h1">BeeJee</a>
+                    {% if user.primaryKey %}
+                        <span class="text-light">Hey, {{ user.username }}!</span>
+                        <a href="/signout" class="btn btn-primary">Sign out</a>
+                    {% else %}
+                        <a href="/signin">Sign in</a>
+                    {% endif %}
         </div>
     </nav>
 

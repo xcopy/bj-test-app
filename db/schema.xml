@@ -22,5 +22,9 @@
         <unique name="unique_username">
             <unique-column name="username"/>
         </unique>
+        <behavior name="validate">
+            <parameter name="username" value="{column: username, validator: NotBlank}"/>
+            <parameter name="password" value="{column: password, validator: NotBlank}"/>
+        </behavior>
     </table>
 </database>

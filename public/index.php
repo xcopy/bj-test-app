@@ -10,10 +10,14 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use App\View;
 use App\Models\Task;
 use App\Models\TaskQuery;
+use App\Models\User;
+use App\Models\UserQuery;
 
 $klein = new Klein();
 
 $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $response) {
+    session_start();
+
     list(
         'page' => $page,
         'column' => $column,
@@ -76,7 +80,7 @@ $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $resp
         'errors' => []
     ];
 
-    if ($request->method() === 'POST') {
+    if ($request->method('POST')) {
         list(
             'username' => $username,
             'email' => $email,
@@ -100,14 +104,62 @@ $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $resp
         }
     }
 
-    return View::render('index.twig', compact(
+    $user = UserQuery::create()->findOneById($_SESSION['user_id']);
+
+    return View::render('index', compact(
         'order', 'column', 'page',
         'sortables', 'pagination',
         'tasks',
-        'form'
+        'form',
+        'user'
     ));
 });
 
+$klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response $response) {
+    session_start();
 
+    $user = $_SESSION['user_id']
+        ? UserQuery::create()->findOneById($_SESSION['user_id'])
+        : new User;
+    $errors = [];
+
+    if ($request->method('POST')) {
+        list(
+            'username' => $username,
+            'password' => $password
+        ) = $request->paramsPost();
+
+        $user = new User;
+        $user->setUsername($username);
+        $user->setPassword($password);
+
+        if ($user->validate()) {
+            $user = UserQuery::create()->findOneByUsername($username);
+
+            if ($user && password_verify($password, $user->getPassword())) {
+                session_start();
+                $_SESSION['user_id'] = $user->getPrimaryKey();
+                $response->redirect('/');
+            }
+        } else {
+            foreach ($user->getValidationFailures() as $failure) {
+                $errors[$failure->getPropertyPath()] = $failure->getMessage();
+            }
+        }
+    }
+
+    return View::render('signin', [
+        'user' => $user,
+        'errors' => $errors
+    ]);
+});
+
+$klein->respond('GET', '/signout', function (Request $request, Response $response) {
+    session_start();
+    $_SESSION['user_id'] = null;
+    session_destroy();
+
+    $response->redirect('/');
+});
 
 $klein->dispatch();

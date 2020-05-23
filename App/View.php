@@ -16,6 +16,6 @@ class View
             $twig = new Environment($loader);
         }
 
-        return $twig->render($name, $args);
+        return $twig->render($name.'.twig', $args);
     }
 }
