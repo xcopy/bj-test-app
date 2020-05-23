@@ -5,16 +5,18 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
+                    {% for sortable in sortables %}
+                        <th>
+                            <a href="/?{{ sortable.query }}">{{ sortable.name|capitalize }}</a>
+                        </th>
+                    {% endfor %}
                     <th>Content</th>
                 </tr>
             </thead>
             <tbody>
-            {% for task in pager %}
+            {% for task in tasks %}
                 <tr>
-                    <td class="text-center">{{ task.id }}</td>
+                    <td>{{ task.id }}</td>
                     <td>{{ task.username }}</td>
                     <td>{{ task.email }}</td>
                     <td>{{ task.content|e }}</td>
@@ -23,26 +25,14 @@
             </tbody>
         </table>
 
-        {% if pager.haveToPaginate %}
+        {% if tasks.haveToPaginate %}
             <nav>
                 <ul class="pagination justify-content-center">
-                    {% if not pager.isFirstPage %}
-                        <li class="page-item" title="Prev">
-                            <a href="/?page={{ pager.previousPage }}" class="page-link">&laquo;</a>
-                        </li>
-                    {% endif %}
-
-                    {% for page in pager.links %}
-                        <li class="page-item{{ (pager.page == page) ? ' active'}}">
-                            <a href="/?page={{ page }}" class="page-link">{{ page }}</a>
+                    {% for pager in pagination %}
+                        <li class="page-item{{ (tasks.page == pager.page) ? ' active'}}">
+                            <a href="/?{{ pager.query }}" class="page-link">{{ pager.page }}</a>
                         </li>
                     {% endfor %}
-
-                    {% if not pager.isLastPage %}
-                        <li class="page-item" title="Next">
-                            <a href="/?page={{ pager.nextPage }}" class="page-link">&raquo;</a>
-                        </li>
-                    {% endif %}
                 </ul>
             </nav>
         {% endif %}
