@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="default" defaultIdMethod="native">
+    <table name="tasks" phpName="Task" namespace="App\Models">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="username" type="varchar" size="255" required="true"/>
+        <column name="email" type="varchar" size="255" required="true"/>
+        <column name="content" type="longvarchar" required="true"/>
+    </table>
+    <table name="users" phpName="User" namespace="App\Models">
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
+        <column name="username" type="varchar" size="255" required="true"/>
+        <column name="password" type="varchar" size="255" required="true"/>
+        <unique name="unique_username">
+            <unique-column name="username"/>
+        </unique>
+    </table>
+</database>

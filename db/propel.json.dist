@@ -1,0 +1,8 @@
+{
+    "propel": {
+        "paths": {
+            "schemaDir": "\/home\/kairat\/web\/php\/beejee-test-app\/db",
+            "phpDir": "\/home\/kairat\/web\/php\/beejee-test-app"
+        }
+    }
+}

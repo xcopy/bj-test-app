@@ -1,6 +1,7 @@
 <?php
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
+require_once dirname(__DIR__).'/db/generated-conf/config.php';
 
 use Klein\Klein;
 use App\View;
