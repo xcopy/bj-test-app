@@ -1,5 +1,26 @@
 {% extends 'layout.twig' %}
 
-{% block body %}
-<h1>Hello, world!</h1>
+{% block content %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Content</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td class="text-center">{{ task.id }}</td>
+                    <td>{{ task.username }}</td>
+                    <td>{{ task.email }}</td>
+                    <td>{{ task.content|e }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

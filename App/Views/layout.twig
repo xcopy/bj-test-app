@@ -7,7 +7,15 @@
     <title>Test App</title>
 </head>
 <body>
-    {% block body %}
-    {% endblock %}
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">BeeJee</span>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
 </body>
 </html>
