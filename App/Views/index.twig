@@ -11,6 +11,9 @@
                         </th>
                     {% endfor %}
                     <th>Content</th>
+                    {% if user.primaryKey %}
+                        <th>-</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +26,11 @@
                     <td>{{ task.username }}</td>
                     <td>{{ task.email }}</td>
                     <td>{{ task.content|e }}</td>
+                    {% if user.primaryKey %}
+                        <td>
+                            <a href="/edit/{{ task.id }}?{{ request.server.get('QUERY_STRING') }}">Edit</a>
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
@@ -41,56 +49,5 @@
         {% endif %}
     </div>
 
-    <hr/>
-
-    <form method="post" class="needs-validation{{ form.errors|length ? ' was-validated' : ''}}" novalidate>
-        <div class="form-group">
-            <div class="form-row">
-                <div class="col">
-                    <label for="username">Username</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        class="form-control"
-                        value="{{ form.task.username }}"
-                        placeholder="Username"
-                        required
-                    />
-                    {% if form.errors and form.errors.username %}
-                        <div class="invalid-feedback">{{ form.errors.username }}</div>
-                    {% endif %}
-                </div>
-                <div class="col">
-                    <label for="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="form-control"
-                        value="{{ form.task.email }}"
-                        placeholder="johndoe@beejee.com"
-                        required
-                    />
-                    {% if form.errors and form.errors.email %}
-                        <div class="invalid-feedback">{{ form.errors.email }}</div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="content">Content</label>
-            <textarea
-                rows="4"
-                id="content"
-                name="content"
-                class="form-control"
-                placeholder="Type something here"
-                required>{{ form.task.content }}</textarea>
-            {% if form.errors and form.errors.content %}
-                <div class="invalid-feedback">{{ form.errors.content }}</div>
-            {% endif %}
-        </div>
-        <button type="submit" class="btn btn-primary">Add new task</button>
-    </form>
+    {% include '_form.twig' %}
 {% endblock %}

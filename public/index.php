@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require_once dirname(__DIR__).'/vendor/autoload.php';
 require_once dirname(__DIR__).'/db/generated-conf/config.php';
 
@@ -13,11 +15,13 @@ use App\Models\TaskQuery;
 use App\Models\User;
 use App\Models\UserQuery;
 
+$user = $_SESSION['user_id']
+    ? UserQuery::create()->findOneById($_SESSION['user_id'])
+    : new User;
+
 $klein = new Klein();
 
-$klein->respond(['GET', 'POST'], '/', function (Request $request, Response $response) {
-    session_start();
-
+$klein->respond(['GET', 'POST'], '/', function (Request $request, Response $response) use ($user) {
     list(
         'page' => $page,
         'column' => $column,
@@ -75,10 +79,8 @@ $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $resp
         ]);
     }
 
-    $form = [
-        'task' => new Task,
-        'errors' => []
-    ];
+    $task = new Task;
+    $errors = [];
 
     if ($request->method('POST')) {
         list(
@@ -87,16 +89,13 @@ $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $resp
             'content' => $content
         ) = $request->paramsPost();
 
-        $task = new Task;
         $task->setUsername($username);
         $task->setEmail($email);
         $task->setContent($content);
 
-        $form['task'] = $task;
-
         if (!$task->validate()) {
             foreach ($task->getValidationFailures() as $failure) {
-                $form['errors'][$failure->getPropertyPath()] = $failure->getMessage();
+                $errors[$failure->getPropertyPath()] = $failure->getMessage();
             }
         } else {
             $task->save();
@@ -104,23 +103,56 @@ $klein->respond(['GET', 'POST'], '/', function (Request $request, Response $resp
         }
     }
 
-    $user = UserQuery::create()->findOneById($_SESSION['user_id']);
-
     return View::render('index', compact(
+        'request',
         'order', 'column', 'page',
         'sortables', 'pagination',
         'tasks',
         'form',
-        'user'
+        'user',
+        'task',
+        'errors'
     ));
 });
 
-$klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response $response) {
-    session_start();
+$klein->respond(['GET', 'POST'], '/edit/[i:id]', function (Request $request, Response $response) use($user) {
+    $id = $request->param('id');
+    $task = TaskQuery::create()->findOneById($id);
+    $errors = [];
 
-    $user = $_SESSION['user_id']
-        ? UserQuery::create()->findOneById($_SESSION['user_id'])
-        : new User;
+    if ($user->getPrimaryKey() && $request->method('POST')) {
+        list(
+            'qs' => $qs,
+            'username' => $username,
+            'email' => $email,
+            'content' => $content,
+            'status' => $status
+        ) = $request->paramsPost();
+
+        $task->setUsername($username);
+        $task->setEmail($email);
+        $task->setContent($content);
+        $task->setStatus($status === 'on');
+
+        if (!$task->validate()) {
+            foreach ($task->getValidationFailures() as $failure) {
+                $errors[$failure->getPropertyPath()] = $failure->getMessage();
+            }
+        } else {
+            $task->save();
+            $response->redirect('/?'.$qs);
+        }
+    }
+
+    return View::render('edit', compact(
+        'request',
+        'user',
+        'task',
+        'errors'
+    ));
+});
+
+$klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response $response) use($user) {
     $errors = [];
 
     if ($request->method('POST')) {
@@ -129,15 +161,13 @@ $klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response
             'password' => $password
         ) = $request->paramsPost();
 
-        $user = new User;
         $user->setUsername($username);
         $user->setPassword($password);
 
         if ($user->validate()) {
             $user = UserQuery::create()->findOneByUsername($username);
 
-            if ($user && password_verify($password, $user->getPassword())) {
-                session_start();
+            if (password_verify($password, $user->getPassword())) {
                 $_SESSION['user_id'] = $user->getPrimaryKey();
                 $response->redirect('/');
             }
@@ -148,14 +178,13 @@ $klein->respond(['GET', 'POST'], '/signin', function (Request $request, Response
         }
     }
 
-    return View::render('signin', [
-        'user' => $user,
-        'errors' => $errors
-    ]);
+    return View::render('signin', compact(
+        'user',
+        'errors'
+));
 });
 
 $klein->respond('GET', '/signout', function (Request $request, Response $response) {
-    session_start();
     $_SESSION['user_id'] = null;
     session_destroy();
 
