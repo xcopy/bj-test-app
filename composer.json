@@ -6,7 +6,8 @@
     "twig/twig": "^3.0",
     "propel/propel": "~2.0@dev",
     "ext-pdo": "*",
-    "fzaninotto/faker": "^1.9"
+    "fzaninotto/faker": "^1.9",
+    "symfony/translation": "4.4.8"
   },
   "autoload": {
     "psr-4": {

@@ -154,6 +154,19 @@ class TaskTableMap extends TableMap
     } // buildRelations()
 
     /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'validate' => array('username_required' => array ('column' => 'username','validator' => 'NotBlank',), 'username_maxlength' => array ('column' => 'username','validator' => 'Length','options' => array ('max' => 50,),), 'email_required' => array ('column' => 'email','validator' => 'NotBlank',), 'email' => array ('column' => 'email','validator' => 'Email',), 'content_required' => array ('column' => 'content','validator' => 'NotBlank',), 'content_maxlength' => array ('column' => 'content','validator' => 'Length','options' => array ('max' => 500,),), ),
+        );
+    } // getBehaviors()
+
+    /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
      *
      * For tables with a single-column primary key, that simple pkey value will be returned.  For tables with

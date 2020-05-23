@@ -5,6 +5,14 @@
         <column name="username" type="varchar" size="255" required="true"/>
         <column name="email" type="varchar" size="255" required="true"/>
         <column name="content" type="longvarchar" required="true"/>
+        <behavior name="validate">
+            <parameter name="username_required" value="{column: username, validator: NotBlank}"/>
+            <parameter name="username_maxlength" value="{column: username, validator: Length, options: {max: 50}}"/>
+            <parameter name="email_required" value="{column: email, validator: NotBlank}"/>
+            <parameter name="email" value="{column: email, validator: Email}"/>
+            <parameter name="content_required" value="{column: content, validator: NotBlank}"/>
+            <parameter name="content_maxlength" value="{column: content, validator: Length, options: {max: 500}}"/>
+        </behavior>
     </table>
     <table name="users" phpName="User" namespace="App\Models">
         <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true"/>
