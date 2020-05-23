@@ -1,0 +1,6 @@
+{
+  "name": "beejee/test-app",
+  "require": {
+    "php": "^7.4"
+  }
+}
